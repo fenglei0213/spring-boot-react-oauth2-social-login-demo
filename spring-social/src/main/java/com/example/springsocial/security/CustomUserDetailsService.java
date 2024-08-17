@@ -29,7 +29,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .orElseThrow(() ->
                         new UsernameNotFoundException("User not found with email : " + email)
         );
-
+        System.out.println("loadUserByUsername : " + user);
         return UserPrincipal.create(user);
     }
 
@@ -38,7 +38,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         User user = userRepository.findById(id).orElseThrow(
             () -> new ResourceNotFoundException("User", "id", id)
         );
-
+        System.out.println("loadUserById : " + user);
         return UserPrincipal.create(user);
     }
 }

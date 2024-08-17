@@ -40,14 +40,21 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-
+        System.out.println("email:" + loginRequest.getEmail());
+        System.out.println("password:" + loginRequest.getPassword());
+        String passwordHash = passwordEncoder.encode(loginRequest.getPassword());
+        System.out.println("passwordHash:" + passwordHash);
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getEmail(),
                         loginRequest.getPassword()
                 )
         );
-
+        // String presentedPassword = authentication.getCredentials().toString();
+        // System.out.println("getCredentials.password:" + presentedPassword);
+        // boolean k = passwordEncoder.matches(presentedPassword, loginRequest.getPassword());
+        // System.out.println("k:" + k);
+        //
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String token = tokenProvider.createToken(authentication);
@@ -56,7 +63,7 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
-        if(userRepository.existsByEmail(signUpRequest.getEmail())) {
+        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
             throw new BadRequestException("Email address already in use.");
         }
 
@@ -66,8 +73,9 @@ public class AuthController {
         user.setEmail(signUpRequest.getEmail());
         user.setPassword(signUpRequest.getPassword());
         user.setProvider(AuthProvider.local);
-
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        String passwordHash = passwordEncoder.encode(user.getPassword());
+        System.out.println("User registered successfully:" + passwordHash);
+        user.setPassword(passwordHash);
 
         User result = userRepository.save(user);
 
